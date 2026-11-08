@@ -370,7 +370,8 @@ class _PluggerHomeState extends State<PluggerHome> {
             ),
             const SizedBox(height: 15),
             const Divider(height: 1),
-            Row(
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 TextButton.icon(
                   onPressed: () => setState(() {
@@ -394,7 +395,6 @@ class _PluggerHomeState extends State<PluggerHome> {
                   icon: const Icon(Icons.mode_comment_outlined, size: 19),
                   label: const Text('Comentar'),
                 ),
-                const Spacer(),
                 IconButton(
                   tooltip: 'Compartir',
                   onPressed: () =>

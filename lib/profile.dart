@@ -703,10 +703,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _panel(BuildContext context, ProfileData data, List<Widget> children) {
     final colors = Theme.of(context).colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        color: colors.surfaceContainer,
-        border: Border.all(color: colors.outlineVariant.withValues(alpha: .45)),
+    return Material(
+      color: colors.surfaceContainer,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: colors.outlineVariant.withValues(alpha: .45)),
         borderRadius: _radius(data),
       ),
       child: Column(
