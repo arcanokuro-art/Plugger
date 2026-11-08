@@ -25,8 +25,17 @@ void main() {
 
     await tester.pumpWidget(const PluggerApp());
     await tester.pumpAndSettle();
+    final homeBar = Theme.of(tester.element(find.byType(AppBar)));
+    final homeNavigation = Theme.of(tester.element(find.byType(NavigationBar)));
     await tester.tap(find.text('Perfil'));
     await tester.pumpAndSettle();
+    final profileBar = Theme.of(tester.element(find.byType(AppBar)));
+    final profileNavigation = Theme.of(
+      tester.element(find.byType(NavigationBar)),
+    );
+    expect(profileBar.appBarTheme.backgroundColor, homeBar.appBarTheme.backgroundColor);
+    expect(profileNavigation.colorScheme, homeNavigation.colorScheme);
+
 
     await tester.tap(find.text('Editar perfil'));
     await tester.pumpAndSettle();

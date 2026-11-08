@@ -7,15 +7,17 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-const profileBackground = Color(0xFF0D0F18);
+import 'palette.dart';
+
+const _classicDark = Color(0xFF0D0F18);
 const _violet = Color(0xFF9860FF);
 const _assetPath = 'assets/profile/';
 const _storageKey = 'plugger.profile';
 
 const _themes = <(String, Color, Color)>[
-  ('Predeterminado', profileBackground, _violet),
+  ('Oscuro violeta', _classicDark, _violet),
   ('Oscuro', Color(0xFF151620), Color(0xFFAAA9CC)),
-  ('Claro', Color(0xFFF4F1FB), Color(0xFF683ACA)),
+  ('Claro', pluggerCanvas, pluggerViolet),
   ('Violeta', Color(0xFF1B1036), Color(0xFFAB65FF)),
   ('Azul', Color(0xFF081D35), Color(0xFF4FAAFF)),
   ('Rojo', Color(0xFF300F19), Color(0xFFFF637D)),
@@ -31,12 +33,11 @@ const _networks = <(String, String, IconData, Color)>[
   ('photos', 'Picasa', Icons.camera, Color(0xFF8451E6)),
 ];
 
-ThemeData get profileTheme => _theme(const ProfileData());
-
-ThemeData _theme(ProfileData data) {
+ThemeData profileTheme(ProfileData data) {
+  if (data.theme == 2) return pluggerLightTheme();
   final (_, background, color) = _themes[data.theme];
-  final brightness = data.theme == 2 ? Brightness.light : Brightness.dark;
   final accent = data.useAccent ? color : _violet;
+  const brightness = Brightness.dark;
   return ThemeData(
     brightness: brightness,
     useMaterial3: true,
@@ -63,7 +64,7 @@ class ProfileData {
     'Desarrollador • Artista • Creador de Velyntora\nDibujo, animación, tecnología y más. 🎨',
   );
   int get theme =>
-      (values['theme'] as int? ?? 0).clamp(0, _themes.length - 1).toInt();
+      (values['theme'] as int? ?? 2).clamp(0, _themes.length - 1).toInt();
   bool get useAccent => values['accent'] as bool? ?? true;
   bool get coverEffect => values['effect'] as bool? ?? false;
   bool get rounded => values['rounded'] as bool? ?? true;
@@ -73,7 +74,14 @@ class ProfileData {
 }
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key, required this.posts, required this.onCompose});
+  const ProfilePage({
+    super.key,
+    required this.profile,
+    required this.posts,
+    required this.onCompose,
+  });
+
+  final ValueNotifier<ProfileData> profile;
 
   final List<String> posts;
   final VoidCallback onCompose;
@@ -83,7 +91,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final _profile = ValueNotifier(const ProfileData());
+  ValueNotifier<ProfileData> get _profile => widget.profile;
   final _scroll = ScrollController();
   int _tab = 0;
   bool _ready = false;
@@ -115,7 +123,6 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void dispose() {
     _scroll.dispose();
-    _profile.dispose();
     super.dispose();
   }
 
@@ -181,7 +188,7 @@ class _ProfilePageState extends State<ProfilePage> {
         builder: (_) => ValueListenableBuilder(
           valueListenable: _profile,
           builder: (_, data, __) => Theme(
-            data: _theme(data),
+            data: profileTheme(data),
             child: Builder(
               builder: (context) => Scaffold(
                 appBar: AppBar(title: Text(title), centerTitle: true),
@@ -208,7 +215,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final value = await showDialog<String>(
       context: context,
       builder: (dialogContext) => Theme(
-        data: _theme(_profile.value),
+        data: profileTheme(_profile.value),
         child: AlertDialog(
           title: Text(label),
           content: Form(
@@ -704,7 +711,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _panel(BuildContext context, ProfileData data, List<Widget> children) {
     final colors = Theme.of(context).colorScheme;
     return Material(
-      color: colors.surfaceContainer,
+      color: colors.brightness == Brightness.light
+          ? Colors.white
+          : colors.surfaceContainer,
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         side: BorderSide(color: colors.outlineVariant.withValues(alpha: .45)),
@@ -904,7 +913,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) => ValueListenableBuilder(
     valueListenable: _profile,
     builder: (_, data, __) => Theme(
-      data: _theme(data),
+      data: profileTheme(data),
       child: Builder(
         builder: (context) => Material(
           color: Theme.of(context).scaffoldBackgroundColor,
@@ -924,8 +933,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: FilledButton.icon(
                               style: FilledButton.styleFrom(
                                 minimumSize: const Size(0, 48),
-                                backgroundColor: _violet,
-                                foregroundColor: const Color(0xFF100722),
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme.primaryContainer,
+                                foregroundColor: Theme.of(context)
+                                    .colorScheme.onPrimaryContainer,
                               ),
                               onPressed: _editProfile,
                               icon: const Icon(Icons.edit_outlined),

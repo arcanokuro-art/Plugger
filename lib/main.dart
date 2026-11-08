@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'palette.dart';
 import 'profile.dart';
 
 void main() => runApp(const PluggerApp());
-
-const _purple = Color(0xFF6956E8);
-const _ink = Color(0xFF202033);
 
 class PluggerApp extends StatelessWidget {
   const PluggerApp({super.key});
@@ -15,17 +13,7 @@ class PluggerApp extends StatelessWidget {
     return MaterialApp(
       title: 'Plugger',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: _purple),
-        scaffoldBackgroundColor: const Color(0xFFF7F7FB),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: _ink,
-          centerTitle: false,
-          elevation: 0,
-        ),
-      ),
+      theme: pluggerLightTheme(),
       home: const PluggerHome(),
     );
   }
@@ -59,7 +47,7 @@ const demoPosts = [
     time: 'Hace 12 min',
     message: '¡Hola, Plugger! ✨ Un nuevo espacio para descubrir y compartir todo lo que nos gusta.',
     icon: Icons.auto_awesome,
-    color: _purple,
+    color: pluggerViolet,
   ),
   SocialPost(
     author: 'Canal Creativo',
@@ -94,6 +82,13 @@ class _PluggerHomeState extends State<PluggerHome> {
   final List<SocialPost> _posts = [...demoPosts];
   final Set<SocialPost> _liked = {};
   final List<String> _ownPosts = [];
+  final _profile = ValueNotifier(const ProfileData());
+
+  @override
+  void dispose() {
+    _profile.dispose();
+    super.dispose();
+  }
 
   void _compose() {
     final controller = TextEditingController();
@@ -145,7 +140,7 @@ class _PluggerHomeState extends State<PluggerHome> {
                         time: 'Ahora',
                         message: message,
                         icon: Icons.auto_awesome,
-                        color: _purple,
+                        color: pluggerViolet,
                       ),
                     );
                     _filter = 'Todos';
@@ -164,16 +159,22 @@ class _PluggerHomeState extends State<PluggerHome> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ValueListenableBuilder(
+    valueListenable: _profile,
+    builder: (context, data, _) => Theme(
+      data: _tab == 3 ? profileTheme(data) : Theme.of(context),
+      child: _home(),
+    ),
+  );
+
+  Widget _home() {
     final titles = ['Inicio', 'Explorar', 'Notificaciones', 'Perfil'];
     final profile = _tab == 3;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: profile ? profileBackground : null,
-        foregroundColor: profile ? Colors.white : null,
         title: Row(
           children: [
-            const Icon(Icons.hub_rounded, color: _purple, size: 28),
+            const Icon(Icons.hub_rounded, color: pluggerViolet, size: 28),
             const SizedBox(width: 9),
             Text(
               profile
@@ -213,7 +214,11 @@ class _PluggerHomeState extends State<PluggerHome> {
             'Todo al día',
             'Aquí aparecerán tus notificaciones cuando conectemos las cuentas.',
           ),
-          ProfilePage(posts: _ownPosts, onCompose: _compose),
+          ProfilePage(
+            profile: _profile,
+            posts: _ownPosts,
+            onCompose: _compose,
+          ),
         ],
       ),
       floatingActionButton: _tab == 0
@@ -223,34 +228,31 @@ class _PluggerHomeState extends State<PluggerHome> {
               label: const Text('Publicar'),
             )
           : null,
-      bottomNavigationBar: Theme(
-        data: profile ? profileTheme : Theme.of(context),
-        child: NavigationBar(
-          selectedIndex: _tab,
-          onDestinationSelected: (value) => setState(() => _tab = value),
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: 'Inicio',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.explore_outlined),
-              selectedIcon: Icon(Icons.explore),
-              label: 'Explorar',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.notifications_none),
-              selectedIcon: Icon(Icons.notifications),
-              label: 'Avisos',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person),
-              label: 'Perfil',
-            ),
-          ],
-        ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _tab,
+        onDestinationSelected: (value) => setState(() => _tab = value),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Inicio',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.explore_outlined),
+            selectedIcon: Icon(Icons.explore),
+            label: 'Explorar',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.notifications_none),
+            selectedIcon: Icon(Icons.notifications),
+            label: 'Avisos',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+        ],
       ),
     );
   }
@@ -276,7 +278,7 @@ class _PluggerHomeState extends State<PluggerHome> {
                 style: TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.bold,
-                  color: _ink,
+                  color: pluggerInk,
                 ),
               ),
               SizedBox(height: 6),
@@ -424,9 +426,9 @@ class _PluggerHomeState extends State<PluggerHome> {
         ),
         const SizedBox(height: 24),
         ...[
-          ('Plugger', 'Tu comunidad', Icons.hub, _purple),
+          ('Plugger', 'Tu comunidad', Icons.hub, pluggerViolet),
           ('YouTube', 'Videos y creadores', Icons.play_circle_fill, Colors.red),
-          ('X', 'Conversaciones y tendencias', Icons.tag, _ink),
+          ('X', 'Conversaciones y tendencias', Icons.tag, pluggerInk),
           ('Facebook', 'Páginas y publicaciones', Icons.groups, Colors.blue),
         ].map(
           (item) => Card(
@@ -460,7 +462,7 @@ class _PluggerHomeState extends State<PluggerHome> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 62, color: _purple),
+            Icon(icon, size: 62, color: pluggerViolet),
             const SizedBox(height: 16),
             Text(
               title,
