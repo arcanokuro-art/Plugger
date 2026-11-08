@@ -3,8 +3,13 @@ name: Build Android APK and publish preview release
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - '.github/workflows/android-release.yml'
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'analysis_options.yaml'
 
 permissions:
   contents: write
@@ -24,6 +29,8 @@ jobs:
         run: flutter pub get
       - name: Analyze source
         run: flutter analyze
+      - name: Test app startup
+        run: flutter test
       - name: Build APK (preview)
         run: flutter build apk --release
       - name: Publish GitHub prerelease
@@ -32,6 +39,7 @@ jobs:
           tag_name: v0.1.0-preview
           name: Plugger 0.1.0 — Vista previa Android
           prerelease: true
+          fail_on_unmatched_files: true
           generate_release_notes: true
           files: build/app/outputs/flutter-apk/app-release.apk
           body: |
