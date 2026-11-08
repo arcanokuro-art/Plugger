@@ -131,8 +131,9 @@ class _ProfilePageState extends State<ProfilePage> {
       try {
         await _prefs.setString(_storageKey, jsonEncode(data.values));
       } catch (_) {
-        if (mounted)
+        if (mounted) {
           _message('No se pudo guardar el cambio en el dispositivo.');
+        }
       }
     });
     return _pendingSave;
@@ -263,8 +264,9 @@ class _ProfilePageState extends State<ProfilePage> {
     if (uri == null ||
         !['https', 'http'].contains(uri.scheme) ||
         !uri.host.contains('.') ||
-        uri.host.contains(' '))
+        uri.host.contains(' ')) {
       return null;
+    }
     return uri;
   }
 
