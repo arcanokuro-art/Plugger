@@ -84,7 +84,6 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final _profile = ValueNotifier(const ProfileData());
-  final _prefs = SharedPreferencesAsync();
   final _scroll = ScrollController();
   int _tab = 0;
   bool _ready = false;
@@ -98,7 +97,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _load() async {
     try {
-      final stored = await _prefs.getString(_storageKey);
+      final prefs = await SharedPreferences.getInstance();
+      final stored = prefs.getString(_storageKey);
       if (!mounted) return;
       if (stored != null) {
         _profile.value = ProfileData(
@@ -129,7 +129,10 @@ class _ProfilePageState extends State<ProfilePage> {
     _profile.value = data;
     _pendingSave = _pendingSave.then((_) async {
       try {
-        await _prefs.setString(_storageKey, jsonEncode(data.values));
+        final prefs = await SharedPreferences.getInstance();
+        if (!await prefs.setString(_storageKey, jsonEncode(data.values))) {
+          throw StateError('No se pudo guardar el perfil.');
+        }
       } catch (_) {
         if (mounted) {
           _message('No se pudo guardar el cambio en el dispositivo.');
@@ -156,7 +159,8 @@ class _ProfilePageState extends State<ProfilePage> {
       final previous = _profile.value.text(key);
       await _update(key, file.path);
       if (previous.isNotEmpty) {
-        final saved = await _prefs.getString(_storageKey);
+        final prefs = await SharedPreferences.getInstance();
+        final saved = prefs.getString(_storageKey);
         if (saved != null &&
             (jsonDecode(saved) as Map<String, dynamic>)[key] != previous) {
           final oldFile = File(previous);
