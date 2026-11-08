@@ -55,4 +55,37 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Actividad reciente'), findsOneWidget);
   });
+
+  testWidgets('A contact opens a chat and the message survives restart', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(const PluggerApp());
+    await tester.pumpAndSettle();
+    final messagesTab = find.descendant(
+      of: find.byType(NavigationBar),
+      matching: find.text('Mensajes'),
+    );
+    await tester.tap(messagesTab);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Contactos'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mariana López'));
+    await tester.pumpAndSettle();
+    expect(find.text('Aún no hay mensajes'), findsOneWidget);
+    await tester.enterText(find.byType(TextField), 'Hola desde Plugger');
+    await tester.tap(find.byTooltip('Enviar mensaje'));
+    await tester.pumpAndSettle();
+    expect(find.text('Hola desde Plugger'), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(const PluggerApp());
+    await tester.pumpAndSettle();
+    await tester.tap(messagesTab);
+    await tester.pumpAndSettle();
+    expect(find.text('Hola desde Plugger'), findsOneWidget);
+  });
 }

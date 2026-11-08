@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'messages.dart';
 import 'palette.dart';
 import 'profile.dart';
 
@@ -162,14 +163,14 @@ class _PluggerHomeState extends State<PluggerHome> {
   Widget build(BuildContext context) => ValueListenableBuilder(
     valueListenable: _profile,
     builder: (context, data, _) => Theme(
-      data: _tab == 3 ? profileTheme(data) : Theme.of(context),
+      data: _tab == 4 ? profileTheme(data) : Theme.of(context),
       child: _home(),
     ),
   );
 
   Widget _home() {
-    final titles = ['Inicio', 'Explorar', 'Notificaciones', 'Perfil'];
-    final profile = _tab == 3;
+    final titles = ['Inicio', 'Explorar', 'Notificaciones', 'Mensajes', 'Perfil'];
+    final profile = _tab == 4;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -190,11 +191,12 @@ class _PluggerHomeState extends State<PluggerHome> {
           ],
         ),
         actions: [
-          IconButton(
-            tooltip: 'Buscar',
-            onPressed: () => setState(() => _tab = 1),
-            icon: const Icon(Icons.search_rounded),
-          ),
+          if (_tab != 3)
+            IconButton(
+              tooltip: 'Buscar',
+              onPressed: () => setState(() => _tab = 1),
+              icon: const Icon(Icons.search_rounded),
+            ),
           if (profile)
             IconButton(
               tooltip: 'Avisos',
@@ -214,6 +216,7 @@ class _PluggerHomeState extends State<PluggerHome> {
             'Todo al día',
             'Aquí aparecerán tus notificaciones cuando conectemos las cuentas.',
           ),
+          const MessagesPage(),
           ProfilePage(
             profile: _profile,
             posts: _ownPosts,
@@ -246,6 +249,11 @@ class _PluggerHomeState extends State<PluggerHome> {
             icon: Icon(Icons.notifications_none),
             selectedIcon: Icon(Icons.notifications),
             label: 'Avisos',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.chat_bubble_outline),
+            selectedIcon: Icon(Icons.chat_bubble),
+            label: 'Mensajes',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),
