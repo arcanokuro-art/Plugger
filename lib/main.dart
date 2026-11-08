@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'profile.dart';
+
 void main() => runApp(const PluggerApp());
 
 const _purple = Color(0xFF6956E8);
@@ -90,7 +92,8 @@ class _PluggerHomeState extends State<PluggerHome> {
   int _tab = 0;
   String _filter = 'Todos';
   final List<SocialPost> _posts = [...demoPosts];
-  final Set<int> _liked = {};
+  final Set<SocialPost> _liked = {};
+  final List<String> _ownPosts = [];
 
   void _compose() {
     final controller = TextEditingController();
@@ -100,14 +103,19 @@ class _PluggerHomeState extends State<PluggerHome> {
       showDragHandle: true,
       builder: (sheetContext) => Padding(
         padding: EdgeInsets.fromLTRB(
-          20, 8, 20, MediaQuery.viewInsetsOf(sheetContext).bottom + 24,
+          20,
+          8,
+          20,
+          MediaQuery.viewInsetsOf(sheetContext).bottom + 24,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Crear publicación',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            const Text(
+              'Crear publicación',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: controller,
@@ -127,6 +135,7 @@ class _PluggerHomeState extends State<PluggerHome> {
                   final message = controller.text.trim();
                   if (message.isEmpty) return;
                   setState(() {
+                    _ownPosts.insert(0, message);
                     _posts.insert(
                       0,
                       SocialPost(
@@ -157,17 +166,26 @@ class _PluggerHomeState extends State<PluggerHome> {
   @override
   Widget build(BuildContext context) {
     final titles = ['Inicio', 'Explorar', 'Notificaciones', 'Perfil'];
+    final profile = _tab == 3;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: profile ? profileBackground : null,
+        foregroundColor: profile ? Colors.white : null,
         title: Row(
           children: [
             const Icon(Icons.hub_rounded, color: _purple, size: 28),
             const SizedBox(width: 9),
-            Text(_tab == 0 ? 'plugger' : titles[_tab],
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.6,
-                )),
+            Text(
+              profile
+                  ? 'Plugger'
+                  : _tab == 0
+                  ? 'plugger'
+                  : titles[_tab],
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.6,
+              ),
+            ),
           ],
         ),
         actions: [
@@ -176,6 +194,12 @@ class _PluggerHomeState extends State<PluggerHome> {
             onPressed: () => setState(() => _tab = 1),
             icon: const Icon(Icons.search_rounded),
           ),
+          if (profile)
+            IconButton(
+              tooltip: 'Avisos',
+              onPressed: () => setState(() => _tab = 2),
+              icon: const Icon(Icons.notifications_none),
+            ),
           const SizedBox(width: 8),
         ],
       ),
@@ -184,9 +208,12 @@ class _PluggerHomeState extends State<PluggerHome> {
         children: [
           _feed(),
           _explore(),
-          _emptyPage(Icons.notifications_none_rounded, 'Todo al día',
-              'Aquí aparecerán tus notificaciones cuando conectemos las cuentas.'),
-          _profile(),
+          _emptyPage(
+            Icons.notifications_none_rounded,
+            'Todo al día',
+            'Aquí aparecerán tus notificaciones cuando conectemos las cuentas.',
+          ),
+          ProfilePage(posts: _ownPosts, onCompose: _compose),
         ],
       ),
       floatingActionButton: _tab == 0
@@ -196,15 +223,34 @@ class _PluggerHomeState extends State<PluggerHome> {
               label: const Text('Publicar'),
             )
           : null,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
-        onDestinationSelected: (value) => setState(() => _tab = value),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Inicio'),
-          NavigationDestination(icon: Icon(Icons.explore_outlined), selectedIcon: Icon(Icons.explore), label: 'Explorar'),
-          NavigationDestination(icon: Icon(Icons.notifications_none), selectedIcon: Icon(Icons.notifications), label: 'Avisos'),
-          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Perfil'),
-        ],
+      bottomNavigationBar: Theme(
+        data: profile ? profileTheme : Theme.of(context),
+        child: NavigationBar(
+          selectedIndex: _tab,
+          onDestinationSelected: (value) => setState(() => _tab = value),
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
+              label: 'Inicio',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.explore_outlined),
+              selectedIcon: Icon(Icons.explore),
+              label: 'Explorar',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.notifications_none),
+              selectedIcon: Icon(Icons.notifications),
+              label: 'Avisos',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              selectedIcon: Icon(Icons.person),
+              label: 'Perfil',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -225,11 +271,19 @@ class _PluggerHomeState extends State<PluggerHome> {
           child: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Tu mundo, en un solo lugar 👋',
-                  style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold, color: _ink)),
+              Text(
+                'Tu mundo, en un solo lugar 👋',
+                style: TextStyle(
+                  fontSize: 23,
+                  fontWeight: FontWeight.bold,
+                  color: _ink,
+                ),
+              ),
               SizedBox(height: 6),
-              Text('Descubre novedades de tu comunidad y tus plataformas favoritas.',
-                  style: TextStyle(color: Colors.black54)),
+              Text(
+                'Descubre novedades de tu comunidad y tus plataformas favoritas.',
+                style: TextStyle(color: Colors.black54),
+              ),
             ],
           ),
         ),
@@ -251,8 +305,11 @@ class _PluggerHomeState extends State<PluggerHome> {
           ),
         ),
         if (filtered.isEmpty)
-          _emptyPage(Icons.dynamic_feed_outlined, 'Sin publicaciones',
-              'Todavía no hay contenido en esta categoría.')
+          _emptyPage(
+            Icons.dynamic_feed_outlined,
+            'Sin publicaciones',
+            'Todavía no hay contenido en esta categoría.',
+          )
         else
           ...filtered.map((post) => _postCard(post)),
       ],
@@ -260,8 +317,7 @@ class _PluggerHomeState extends State<PluggerHome> {
   }
 
   Widget _postCard(SocialPost post) {
-    final index = _posts.indexOf(post);
-    final liked = _liked.contains(index);
+    final liked = _liked.contains(post);
     return Card(
       margin: const EdgeInsets.fromLTRB(14, 5, 14, 11),
       elevation: 0,
@@ -283,21 +339,35 @@ class _PluggerHomeState extends State<PluggerHome> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(post.author, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text('${post.handle} · ${post.time}',
-                          style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                      Text(
+                        post.author,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${post.handle} · ${post.time}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black54,
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 Chip(
                   avatar: Icon(post.icon, size: 15, color: post.color),
-                  label: Text(post.source, style: const TextStyle(fontSize: 11)),
+                  label: Text(
+                    post.source,
+                    style: const TextStyle(fontSize: 11),
+                  ),
                   visualDensity: VisualDensity.compact,
                 ),
               ],
             ),
             const SizedBox(height: 18),
-            Text(post.message, style: const TextStyle(fontSize: 15, height: 1.45)),
+            Text(
+              post.message,
+              style: const TextStyle(fontSize: 15, height: 1.45),
+            ),
             const SizedBox(height: 15),
             const Divider(height: 1),
             Row(
@@ -305,24 +375,30 @@ class _PluggerHomeState extends State<PluggerHome> {
                 TextButton.icon(
                   onPressed: () => setState(() {
                     if (liked) {
-                      _liked.remove(index);
+                      _liked.remove(post);
                     } else {
-                      _liked.add(index);
+                      _liked.add(post);
                     }
                   }),
-                  icon: Icon(liked ? Icons.favorite : Icons.favorite_border,
-                      size: 19, color: liked ? Colors.pink : null),
+                  icon: Icon(
+                    liked ? Icons.favorite : Icons.favorite_border,
+                    size: 19,
+                    color: liked ? Colors.pink : null,
+                  ),
                   label: Text(liked ? 'Te gusta' : 'Me gusta'),
                 ),
                 TextButton.icon(
-                  onPressed: () => _notice('Los comentarios estarán disponibles próximamente.'),
+                  onPressed: () => _notice(
+                    'Los comentarios estarán disponibles próximamente.',
+                  ),
                   icon: const Icon(Icons.mode_comment_outlined, size: 19),
                   label: const Text('Comentar'),
                 ),
                 const Spacer(),
                 IconButton(
                   tooltip: 'Compartir',
-                  onPressed: () => _notice('Próximamente podrás compartir publicaciones.'),
+                  onPressed: () =>
+                      _notice('Próximamente podrás compartir publicaciones.'),
                   icon: const Icon(Icons.share_outlined, size: 20),
                 ),
               ],
@@ -337,69 +413,41 @@ class _PluggerHomeState extends State<PluggerHome> {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Text('Descubre más', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+        const Text(
+          'Descubre más',
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
-        const Text('Explora las fuentes que formarán parte de tu experiencia.',
-            style: TextStyle(color: Colors.black54)),
+        const Text(
+          'Explora las fuentes que formarán parte de tu experiencia.',
+          style: TextStyle(color: Colors.black54),
+        ),
         const SizedBox(height: 24),
         ...[
           ('Plugger', 'Tu comunidad', Icons.hub, _purple),
           ('YouTube', 'Videos y creadores', Icons.play_circle_fill, Colors.red),
           ('X', 'Conversaciones y tendencias', Icons.tag, _ink),
           ('Facebook', 'Páginas y publicaciones', Icons.groups, Colors.blue),
-        ].map((item) => Card(
-              color: Colors.white,
-              elevation: 0,
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: item.$4.withValues(alpha: 0.12),
-                  child: Icon(item.$3, color: item.$4),
-                ),
-                title: Text(item.$1, style: const TextStyle(fontWeight: FontWeight.w600)),
-                subtitle: Text(item.$2),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => _notice('La integración con ${item.$1} llegará en una etapa posterior.'),
+        ].map(
+          (item) => Card(
+            color: Colors.white,
+            elevation: 0,
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: item.$4.withValues(alpha: 0.12),
+                child: Icon(item.$3, color: item.$4),
               ),
-            )),
-      ],
-    );
-  }
-
-  Widget _profile() {
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        const SizedBox(height: 20),
-        const Center(child: CircleAvatar(
-          radius: 42,
-          backgroundColor: Color(0xFFE9E5FF),
-          child: Icon(Icons.person_rounded, color: _purple, size: 46),
-        )),
-        const SizedBox(height: 14),
-        const Center(child: Text('Tu perfil',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold))),
-        const Center(child: Text('@usuario · Vista de demostración',
-            style: TextStyle(color: Colors.black54))),
-        const SizedBox(height: 24),
-        Card(
-          color: Colors.white,
-          elevation: 0,
-          child: Column(children: [
-            ListTile(
-              leading: const Icon(Icons.link_rounded, color: _purple),
-              title: const Text('Cuentas conectadas'),
-              subtitle: const Text('Próximamente'),
+              title: Text(
+                item.$1,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              subtitle: Text(item.$2),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => _notice('Las conexiones estarán disponibles próximamente.'),
+              onTap: () => _notice(
+                'La integración con ${item.$1} llegará en una etapa posterior.',
+              ),
             ),
-            const Divider(height: 1),
-            ListTile(
-              leading: const Icon(Icons.settings_outlined, color: _purple),
-              title: const Text('Configuración'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => _notice('La configuración estará disponible próximamente.'),
-            ),
-          ]),
+          ),
         ),
       ],
     );
@@ -414,10 +462,16 @@ class _PluggerHomeState extends State<PluggerHome> {
           children: [
             Icon(icon, size: 62, color: _purple),
             const SizedBox(height: 16),
-            Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
-            Text(subtitle, textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.black54)),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.black54),
+            ),
           ],
         ),
       ),
@@ -425,6 +479,7 @@ class _PluggerHomeState extends State<PluggerHome> {
   }
 
   void _notice(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 }

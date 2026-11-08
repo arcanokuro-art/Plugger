@@ -7,6 +7,7 @@ on:
     paths:
       - '.github/workflows/android-release.yml'
       - 'lib/**'
+      - 'assets/**'
       - 'test/**'
       - 'pubspec.yaml'
       - 'analysis_options.yaml'
@@ -36,14 +37,13 @@ jobs:
       - name: Publish GitHub prerelease
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.1.0-preview
-          name: Plugger 0.1.0 — Vista previa Android
+          tag_name: v0.2.0-profile-preview
+          name: Plugger 0.2.0 — Vista previa Android
           prerelease: true
           fail_on_unmatched_files: true
           generate_release_notes: true
           files: build/app/outputs/flutter-apk/app-release.apk
           body: |
-            Primera vista previa de la interfaz Flutter de Plugger.
-            Feed, filtros, navegación, perfil y publicaciones locales de demostración.
-            Sin conexión a servicios externos ni persistencia de datos.
+            Vista previa del perfil Android de Plugger.
+            Edición y apariencia persistentes en el dispositivo. Actividad externa de demostración y enlaces configurables.
             APK de prueba firmado con la configuración predeterminada de Flutter; no apto para distribución definitiva.
