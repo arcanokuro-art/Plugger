@@ -90,4 +90,47 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Hola desde Plugger'), findsOneWidget);
   });
+
+  testWidgets('The selected theme colors every tab and profile routes open instantly', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(const PluggerApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.person_outline));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Apariencia del perfil'));
+    await tester.pumpAndSettle();
+
+    final appearance = tester.element(find.text('Apariencia del perfil'));
+    final route = ModalRoute.of(appearance)!;
+    expect(route.transitionDuration, Duration.zero);
+    expect(route.reverseTransitionDuration, Duration.zero);
+
+    await tester.tap(find.text('Rojo'));
+    await tester.pumpAndSettle();
+    const red = Color(0xFF300F19);
+    expect(Theme.of(appearance).scaffoldBackgroundColor, red);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    for (final icon in [
+      Icons.home_outlined,
+      Icons.explore_outlined,
+      Icons.notifications_none,
+      Icons.chat_bubble_outline,
+    ]) {
+      final destination = find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.byIcon(icon),
+      );
+      await tester.tap(destination);
+      await tester.pumpAndSettle();
+      final appBar = tester.element(find.byType(AppBar));
+      expect(Theme.of(appBar).scaffoldBackgroundColor, red);
+      expect(Theme.of(appBar).brightness, Brightness.dark);
+    }
+  });
 }

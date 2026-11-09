@@ -6,17 +6,14 @@ extension _ProfileEditor on _ProfilePageState {
     Widget Function(BuildContext, ProfileData) content,
   ) {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ValueListenableBuilder(
+      PageRouteBuilder<void>(
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+        pageBuilder: (_, __, ___) => ValueListenableBuilder(
           valueListenable: _profile,
-          builder: (_, data, __) => Theme(
-            data: profileTheme(data),
-            child: Builder(
-              builder: (context) => Scaffold(
-                appBar: AppBar(title: Text(title), centerTitle: true),
-                body: content(context, data),
-              ),
-            ),
+          builder: (context, data, _) => Scaffold(
+            appBar: AppBar(title: Text(title), centerTitle: true),
+            body: content(context, data),
           ),
         ),
       ),
@@ -36,53 +33,50 @@ extension _ProfileEditor on _ProfilePageState {
     final formKey = GlobalKey<FormState>();
     final value = await showDialog<String>(
       context: context,
-      builder: (dialogContext) => Theme(
-        data: profileTheme(_profile.value),
-        child: AlertDialog(
-          title: Text(label),
-          content: Form(
-            key: formKey,
-            child: TextFormField(
-              initialValue: initial,
-              onChanged: (value) => draft = value,
-              autofocus: true,
-              maxLines: lines,
-              maxLength: url
-                  ? null
-                  : lines > 1
-                  ? 240
-                  : 80,
-              keyboardType: url ? TextInputType.url : null,
-              validator: (input) {
-                final value = input?.trim() ?? '';
-                if (required && value.isEmpty) return 'Escribe un valor.';
-                if (key == 'handle' &&
-                    !RegExp(r'^@?[A-Za-z0-9._]{2,30}$').hasMatch(value)) {
-                  return 'Usa de 2 a 30 letras, números, puntos o guiones bajos.';
-                }
-                if (url && value.isNotEmpty && _webUri(value) == null) {
-                  return 'Escribe un enlace válido.';
-                }
-                return null;
-              },
-              decoration: InputDecoration(labelText: label),
-            ),
+      builder: (dialogContext) => AlertDialog(
+        title: Text(label),
+        content: Form(
+          key: formKey,
+          child: TextFormField(
+            initialValue: initial,
+            onChanged: (value) => draft = value,
+            autofocus: true,
+            maxLines: lines,
+            maxLength: url
+                ? null
+                : lines > 1
+                ? 240
+                : 80,
+            keyboardType: url ? TextInputType.url : null,
+            validator: (input) {
+              final value = input?.trim() ?? '';
+              if (required && value.isEmpty) return 'Escribe un valor.';
+              if (key == 'handle' &&
+                  !RegExp(r'^@?[A-Za-z0-9._]{2,30}$').hasMatch(value)) {
+                return 'Usa de 2 a 30 letras, números, puntos o guiones bajos.';
+              }
+              if (url && value.isNotEmpty && _webUri(value) == null) {
+                return 'Escribe un enlace válido.';
+              }
+              return null;
+            },
+            decoration: InputDecoration(labelText: label),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancelar'),
-            ),
-            FilledButton(
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  Navigator.pop(dialogContext, draft.trim());
-                }
-              },
-              child: const Text('Guardar'),
-            ),
-          ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Navigator.pop(dialogContext, draft.trim());
+              }
+            },
+            child: const Text('Guardar'),
+          ),
+        ],
       ),
     );
     if (value == null || !mounted) return;

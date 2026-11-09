@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:plugger/shared/theme/palette.dart';
 import 'package:plugger/shared/widgets/empty_state.dart';
 import 'package:plugger/shared/widgets/notice.dart';
 import '../domain/social_post.dart';
@@ -23,6 +22,7 @@ class FeedPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final filtered = posts.where((post) {
       if (filter == 'Todos') return true;
       if (filter == 'Plugger') return post.source == 'Plugger';
@@ -34,8 +34,8 @@ class FeedPage extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
-          color: Colors.white,
-          child: const Column(
+          color: colors.surface,
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -43,13 +43,13 @@ class FeedPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.bold,
-                  color: pluggerInk,
+                  color: colors.onSurface,
                 ),
               ),
-              SizedBox(height: 6),
+              const SizedBox(height: 6),
               Text(
                 'Descubre novedades de tu comunidad y tus plataformas favoritas.',
-                style: TextStyle(color: Colors.black54),
+                style: TextStyle(color: colors.onSurfaceVariant),
               ),
             ],
           ),
@@ -84,11 +84,17 @@ class FeedPage extends StatelessWidget {
   }
 
   Widget _postCard(BuildContext context, SocialPost post) {
+    final colors = Theme.of(context).colorScheme;
     final liked = likedPosts.contains(post);
+    final sourceColor = switch (post.source) {
+      'Plugger' => colors.primary,
+      'X · Demo' => colors.onSurface,
+      _ => post.color,
+    };
     return Card(
       margin: const EdgeInsets.fromLTRB(14, 5, 14, 11),
       elevation: 0,
-      color: Colors.white,
+      color: colors.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(17),
@@ -98,8 +104,8 @@ class FeedPage extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: post.color.withValues(alpha: 0.12),
-                  child: Icon(post.icon, color: post.color),
+                  backgroundColor: sourceColor.withValues(alpha: 0.12),
+                  child: Icon(post.icon, color: sourceColor),
                 ),
                 const SizedBox(width: 11),
                 Expanded(
@@ -112,16 +118,16 @@ class FeedPage extends StatelessWidget {
                       ),
                       Text(
                         '${post.handle} · ${post.time}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Colors.black54,
+                          color: colors.onSurfaceVariant,
                         ),
                       ),
                     ],
                   ),
                 ),
                 Chip(
-                  avatar: Icon(post.icon, size: 15, color: post.color),
+                  avatar: Icon(post.icon, size: 15, color: sourceColor),
                   label: Text(
                     post.source,
                     style: const TextStyle(fontSize: 11),

@@ -166,7 +166,7 @@ class _MessagesPageState extends State<MessagesPage> {
                     hintText: _showContacts ? 'Buscar contactos' : 'Buscar chats',
                     prefixIcon: const Icon(Icons.search),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: colors.surface,
                     isDense: true,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(28),
@@ -196,7 +196,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 if (_showContacts)
                   Card(
                     elevation: 0,
-                    color: Colors.white,
+                    color: colors.surface,
                     child: ListTile(
                       leading: const Icon(Icons.person_add_alt_1_outlined),
                       title: const Text('Agregar contacto'),
@@ -226,7 +226,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 else
                   Card(
                     elevation: 0,
-                    color: Colors.white,
+                    color: colors.surface,
                     clipBehavior: Clip.antiAlias,
                     child: Column(
                       children: [

@@ -10,7 +10,7 @@ extension _ProfileAppearance on _ProfilePageState {
           children: [
             const TabBar(
               tabs: [
-                Tab(text: 'Tema del perfil'),
+                Tab(text: 'Tema de la app'),
                 Tab(text: 'Vista previa'),
               ],
             ),
@@ -21,7 +21,7 @@ extension _ProfileAppearance on _ProfilePageState {
                     padding: const EdgeInsets.all(16),
                     children: [
                       const Text(
-                        'Estos ajustes se aplican en este dispositivo.',
+                        'El tema se aplica a toda la app en este dispositivo.',
                       ),
                       const SizedBox(height: 16),
                       GridView.builder(

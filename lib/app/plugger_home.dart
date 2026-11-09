@@ -11,7 +11,9 @@ import 'package:plugger/features/profile/profile_page.dart';
 import 'package:plugger/shared/theme/palette.dart';
 
 class PluggerHome extends StatefulWidget {
-  const PluggerHome({super.key});
+  const PluggerHome({super.key, required this.profile});
+
+  final ValueNotifier<ProfileData> profile;
 
   @override
   State<PluggerHome> createState() => _PluggerHomeState();
@@ -23,13 +25,6 @@ class _PluggerHomeState extends State<PluggerHome> {
   final List<SocialPost> _posts = [...demoPosts];
   final Set<SocialPost> _liked = {};
   final List<String> _ownPosts = [];
-  final _profile = ValueNotifier(const ProfileData());
-
-  @override
-  void dispose() {
-    _profile.dispose();
-    super.dispose();
-  }
 
   void _compose() {
     showPostComposer(context, (message) {
@@ -60,22 +55,14 @@ class _PluggerHomeState extends State<PluggerHome> {
   }
 
   @override
-  Widget build(BuildContext context) => ValueListenableBuilder(
-    valueListenable: _profile,
-    builder: (context, data, _) => Theme(
-      data: _tab == 4 ? profileTheme(data) : Theme.of(context),
-      child: _home(),
-    ),
-  );
-
-  Widget _home() {
+  Widget build(BuildContext context) {
     final titles = ['Inicio', 'Explorar', 'Notificaciones', 'Mensajes', 'Perfil'];
     final profile = _tab == 4;
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            const Icon(Icons.hub_rounded, color: pluggerViolet, size: 28),
+            Icon(Icons.hub_rounded, color: Theme.of(context).colorScheme.primary, size: 28),
             const SizedBox(width: 9),
             Text(
               profile
@@ -120,7 +107,7 @@ class _PluggerHomeState extends State<PluggerHome> {
           const NotificationsPage(),
           const MessagesPage(),
           ProfilePage(
-            profile: _profile,
+            profile: widget.profile,
             posts: _ownPosts,
             onCompose: _compose,
           ),

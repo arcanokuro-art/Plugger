@@ -6,7 +6,7 @@ const pluggerCanvas = Color(0xFFF7F7FB);
 
 ThemeData pluggerLightTheme() => ThemeData(
   useMaterial3: true,
-  colorScheme: ColorScheme.fromSeed(seedColor: pluggerViolet),
+  colorScheme: ColorScheme.fromSeed(seedColor: pluggerViolet).copyWith(surface: Colors.white),
   scaffoldBackgroundColor: pluggerCanvas,
   appBarTheme: const AppBarTheme(
     backgroundColor: Colors.white,

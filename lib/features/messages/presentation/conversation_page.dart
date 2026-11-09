@@ -130,7 +130,7 @@ class _ConversationState extends State<_Conversation> {
                   ? Center(
                       child: Card(
                         elevation: 0,
-                        color: Colors.white,
+                        color: colors.surface,
                         margin: const EdgeInsets.all(24),
                         child: Padding(
                           padding: const EdgeInsets.all(18),
@@ -160,7 +160,7 @@ class _ConversationState extends State<_Conversation> {
               top: false,
               minimum: const EdgeInsets.fromLTRB(8, 4, 8, 8),
               child: Material(
-                color: Colors.white,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(28),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,

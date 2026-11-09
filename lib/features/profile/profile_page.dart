@@ -121,102 +121,97 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) => ValueListenableBuilder(
     valueListenable: _profile,
-    builder: (_, data, __) => Theme(
-      data: profileTheme(data),
-      child: Builder(
-        builder: (context) => Material(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: !_ready
-              ? const Center(child: CircularProgressIndicator())
-              : ListView(
-                  controller: _scroll,
-                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 24),
+    builder: (context, data, _) => Material(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: !_ready
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              controller: _scroll,
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 24),
+              children: [
+                if (_tab != 3) ...[
+                  _header(context, data),
+                  _identity(context, data),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size(0, 48),
+                            backgroundColor: Theme.of(context)
+                                .colorScheme.primaryContainer,
+                            foregroundColor: Theme.of(context)
+                                .colorScheme.onPrimaryContainer,
+                          ),
+                          onPressed: _editProfile,
+                          icon: const Icon(Icons.edit_outlined),
+                          label: const Text('Editar perfil'),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton.filledTonal(
+                        onPressed: _appearance,
+                        tooltip: 'Apariencia del perfil',
+                        icon: const Icon(Icons.settings_outlined),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                ],
+                Row(
                   children: [
-                    if (_tab != 3) ...[
-                      _header(context, data),
-                      _identity(context, data),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: FilledButton.icon(
-                              style: FilledButton.styleFrom(
-                                minimumSize: const Size(0, 48),
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme.primaryContainer,
-                                foregroundColor: Theme.of(context)
-                                    .colorScheme.onPrimaryContainer,
-                              ),
-                              onPressed: _editProfile,
-                              icon: const Icon(Icons.edit_outlined),
-                              label: const Text('Editar perfil'),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton.filledTonal(
-                            onPressed: _appearance,
-                            tooltip: 'Apariencia del perfil',
-                            icon: const Icon(Icons.settings_outlined),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                    ],
-                    Row(
-                      children: [
-                        _tabButton(
-                          context,
-                          data,
-                          0,
-                          'Publicaciones',
-                          Icons.grid_view_rounded,
-                        ),
-                        _tabButton(
-                          context,
-                          data,
-                          1,
-                          'Fotos',
-                          Icons.image_outlined,
-                        ),
-                        _tabButton(
-                          context,
-                          data,
-                          2,
-                          'Videos',
-                          Icons.play_circle_outline,
-                        ),
-                        _tabButton(context, data, 3, 'Conectado', Icons.link),
-                      ],
+                    _tabButton(
+                      context,
+                      data,
+                      0,
+                      'Publicaciones',
+                      Icons.grid_view_rounded,
                     ),
-                    const SizedBox(height: 16),
-                    if (_tab == 0) ...[
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton.icon(
-                          onPressed: widget.onCompose,
-                          icon: const Icon(Icons.add),
-                          label: const Text('Publicar'),
-                        ),
-                      ),
-                      for (final post in widget.posts) ...[
-                        _post(context, data, post),
-                        const SizedBox(height: 10),
-                      ],
-                      _post(context, data),
-                    ],
-                    if (_tab == 1) _post(context, data),
-                    if (_tab == 2)
-                      _panel(context, data, const [
-                        ListTile(
-                          leading: Icon(Icons.play_circle_outline),
-                          title: Text('Todavía no hay videos'),
-                        ),
-                      ]),
-                    if (_tab == 3) _connected(context, data),
+                    _tabButton(
+                      context,
+                      data,
+                      1,
+                      'Fotos',
+                      Icons.image_outlined,
+                    ),
+                    _tabButton(
+                      context,
+                      data,
+                      2,
+                      'Videos',
+                      Icons.play_circle_outline,
+                    ),
+                    _tabButton(context, data, 3, 'Conectado', Icons.link),
                   ],
                 ),
-        ),
-      ),
+                const SizedBox(height: 16),
+                if (_tab == 0) ...[
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: widget.onCompose,
+                      icon: const Icon(Icons.add),
+                      label: const Text('Publicar'),
+                    ),
+                  ),
+                  for (final post in widget.posts) ...[
+                    _post(context, data, post),
+                    const SizedBox(height: 10),
+                  ],
+                  _post(context, data),
+                ],
+                if (_tab == 1) _post(context, data),
+                if (_tab == 2)
+                  _panel(context, data, const [
+                    ListTile(
+                      leading: Icon(Icons.play_circle_outline),
+                      title: Text('Todavía no hay videos'),
+                    ),
+                  ]),
+                if (_tab == 3) _connected(context, data),
+              ],
+            ),
     ),
   );
 }

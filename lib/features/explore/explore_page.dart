@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:plugger/shared/theme/palette.dart';
 import 'package:plugger/shared/widgets/notice.dart';
 
 class ExplorePage extends StatelessWidget {
@@ -8,6 +7,7 @@ class ExplorePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -16,19 +16,19 @@ class ExplorePage extends StatelessWidget {
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           'Explora las fuentes que formarán parte de tu experiencia.',
-          style: TextStyle(color: Colors.black54),
+          style: TextStyle(color: colors.onSurfaceVariant),
         ),
         const SizedBox(height: 24),
         ...[
-          ('Plugger', 'Tu comunidad', Icons.hub, pluggerViolet),
+          ('Plugger', 'Tu comunidad', Icons.hub, colors.primary),
           ('YouTube', 'Videos y creadores', Icons.play_circle_fill, Colors.red),
-          ('X', 'Conversaciones y tendencias', Icons.tag, pluggerInk),
+          ('X', 'Conversaciones y tendencias', Icons.tag, colors.onSurface),
           ('Facebook', 'Páginas y publicaciones', Icons.groups, Colors.blue),
         ].map(
           (item) => Card(
-            color: Colors.white,
+            color: colors.surface,
             elevation: 0,
             child: ListTile(
               leading: CircleAvatar(

@@ -1,7 +1,7 @@
 name: plugger
 description: Interfaz inicial de Plugger, un feed social unificado.
 publish_to: none
-version: 0.3.3+7
+version: 0.3.4+8
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
