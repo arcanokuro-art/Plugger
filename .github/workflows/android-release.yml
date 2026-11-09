@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/android-release.yml'
+      - '.github/scripts/sign-android-preview.sh'
       - 'lib/**'
       - 'assets/**'
       - 'test/**'
@@ -15,35 +16,79 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: plugger-android-preview
+
 jobs:
   android:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
       - name: Generate Android platform files
-        run: flutter create --platforms=android --project-name plugger .
+        run: flutter create --platforms=android --project-name plugger --org com.example .
       - name: Install dependencies
         run: flutter pub get
       - name: Analyze source
         run: flutter analyze
       - name: Test app startup
         run: flutter test
-      - name: Build APK (preview)
+      - name: Prepare signed preview version
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PLUGGER_ANDROID_KEYSTORE_BASE64: ${{ secrets.PLUGGER_ANDROID_KEYSTORE_BASE64 }}
+          PLUGGER_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.PLUGGER_ANDROID_KEYSTORE_PASSWORD }}
+          PLUGGER_ANDROID_CERT_SHA256: ${{ vars.PLUGGER_ANDROID_CERT_SHA256 }}
+        run: |
+          set -euo pipefail
+          : "${PLUGGER_ANDROID_KEYSTORE_BASE64:?Configura el secreto PLUGGER_ANDROID_KEYSTORE_BASE64}"
+          : "${PLUGGER_ANDROID_KEYSTORE_PASSWORD:?Configura el secreto PLUGGER_ANDROID_KEYSTORE_PASSWORD}"
+          : "${PLUGGER_ANDROID_CERT_SHA256:?Configura la variable PLUGGER_ANDROID_CERT_SHA256}"
+
+          version=$(awk '/^version: / {print $2}' pubspec.yaml)
+          if [[ ! $version =~ ^([0-9]+\.[0-9]+\.[0-9]+)\+([1-9][0-9]*)$ ]]; then
+            echo 'Usa una versión con formato X.Y.Z+N en pubspec.yaml.' >&2
+            exit 1
+          fi
+          name=${BASH_REMATCH[1]}
+          code=${BASH_REMATCH[2]}
+          previous_codes=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases" \
+            --jq '.[].tag_name | select(test("^v[0-9]+\\.[0-9]+\\.[0-9]+-android-[0-9]+$")) | split("-")[-1]')
+          for previous_code in 5 $previous_codes; do
+            if (( code <= previous_code )); then
+              echo 'Aumenta el código de versión de Android en pubspec.yaml.' >&2
+              exit 1
+            fi
+          done
+          echo "tag=v${name}-android-${code}" >> "$GITHUB_OUTPUT"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+      - name: Build APK
         run: flutter build apk --release
+      - name: Sign and verify APK
+        env:
+          PLUGGER_ANDROID_KEYSTORE_BASE64: ${{ secrets.PLUGGER_ANDROID_KEYSTORE_BASE64 }}
+          PLUGGER_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.PLUGGER_ANDROID_KEYSTORE_PASSWORD }}
+          PLUGGER_ANDROID_CERT_SHA256: ${{ vars.PLUGGER_ANDROID_CERT_SHA256 }}
+        run: |
+          mkdir -p signed
+          bash .github/scripts/sign-android-preview.sh \
+            build/app/outputs/flutter-apk/app-release.apk signed/app-release.apk
       - name: Publish GitHub prerelease
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.3.1-navigation-preview
-          name: Plugger 0.3.1 — Vista previa Android
+          tag_name: ${{ steps.release.outputs.tag }}
+          name: Plugger ${{ steps.release.outputs.name }} — Vista previa Android
           prerelease: true
           fail_on_unmatched_files: true
           generate_release_notes: true
-          files: build/app/outputs/flutter-apk/app-release.apk
+          files: signed/app-release.apk
           body: |
-            Barra inferior con cinco iconos y etiquetas accesibles.
-            Edición y apariencia persistentes en el dispositivo. Actividad externa de demostración y enlaces configurables.
-            APK de prueba firmado con la configuración predeterminada de Flutter; no apto para distribución definitiva.
+            APK firmado con el certificado fijo de Plugger.
+            La primera instalación desde una compilación con firma diferente requiere desinstalar esa compilación.
