@@ -71,11 +71,11 @@ class _PluggerHomeState extends State<PluggerHome> {
             Flexible(
               Text(
                 profile
-                overflow: TextOverflow.ellipsis,
                     ? 'Plugger'
                     : _tab == 0
                     ? 'plugger'
                     : titles[_tab],
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.6,
