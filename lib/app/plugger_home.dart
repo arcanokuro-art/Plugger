@@ -69,7 +69,7 @@ class _PluggerHomeState extends State<PluggerHome> {
             ),
             const SizedBox(width: 9),
             Flexible(
-              Text(
+              child: Text(
                 profile
                     ? 'Plugger'
                     : _tab == 0
