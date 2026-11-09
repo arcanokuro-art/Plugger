@@ -232,6 +232,7 @@ class _PluggerHomeState extends State<PluggerHome> {
             )
           : null,
       bottomNavigationBar: NavigationBar(
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         selectedIndex: _tab,
         onDestinationSelected: (value) => setState(() => _tab = value),
         destinations: const [

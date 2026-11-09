@@ -11,10 +11,15 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('plugger'), findsOneWidget);
-    expect(find.text('Inicio'), findsOneWidget);
-    expect(find.text('Explorar'), findsOneWidget);
-    expect(find.text('Avisos'), findsOneWidget);
-    expect(find.text('Perfil'), findsOneWidget);
+    expect(
+      tester.widget<NavigationBar>(find.byType(NavigationBar)).labelBehavior,
+      NavigationDestinationLabelBehavior.alwaysHide,
+    );
+    expect(find.byType(NavigationDestination), findsNWidgets(5));
+    expect(find.byIcon(Icons.home), findsWidgets);
+    expect(find.byIcon(Icons.explore_outlined), findsWidgets);
+    expect(find.byIcon(Icons.notifications_none), findsWidgets);
+    expect(find.byIcon(Icons.person_outline), findsWidgets);
   });
 
   testWidgets('Profile edits are saved and the connected tab opens', (
@@ -27,7 +32,7 @@ void main() {
     await tester.pumpAndSettle();
     final homeBar = Theme.of(tester.element(find.byType(AppBar)));
     final homeNavigation = Theme.of(tester.element(find.byType(NavigationBar)));
-    await tester.tap(find.text('Perfil'));
+    await tester.tap(find.byIcon(Icons.person_outline));
     await tester.pumpAndSettle();
     final profileBar = Theme.of(tester.element(find.byType(AppBar)));
     final profileNavigation = Theme.of(
@@ -64,10 +69,7 @@ void main() {
 
     await tester.pumpWidget(const PluggerApp());
     await tester.pumpAndSettle();
-    final messagesTab = find.descendant(
-      of: find.byType(NavigationBar),
-      matching: find.text('Mensajes'),
-    );
+    final messagesTab = find.byIcon(Icons.chat_bubble_outline);
     await tester.tap(messagesTab);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Contactos'));
