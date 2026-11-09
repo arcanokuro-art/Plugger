@@ -34,7 +34,7 @@ printf '%s' "$PLUGGER_ANDROID_KEYSTORE_BASE64" | base64 --decode > "$keystore"
 
 verification=$("$apksigner" verify --print-certs "$output_apk")
 actual_cert=$(printf '%s\n' "$verification" | awk '
-  /^[[:space:]]*Signer.*certificate SHA-256 digest:/ {
+  /^[[:space:]]*(V[0-9.]+[[:space:]]+)?Signer.*certificate SHA-256 digest:/ {
     sub(/^.*certificate SHA-256 digest:[[:space:]]*/, "")
     gsub(/[:[:space:]]/, "")
     print tolower($0)
