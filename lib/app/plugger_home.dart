@@ -62,17 +62,24 @@ class _PluggerHomeState extends State<PluggerHome> {
       appBar: AppBar(
         title: Row(
           children: [
-            Icon(Icons.hub_rounded, color: Theme.of(context).colorScheme.primary, size: 28),
+            Icon(
+              Icons.hub_rounded,
+              color: Theme.of(context).colorScheme.primary,
+              size: 28,
+            ),
             const SizedBox(width: 9),
-            Text(
-              profile
-                  ? 'Plugger'
-                  : _tab == 0
-                  ? 'plugger'
-                  : titles[_tab],
-              style: const TextStyle(
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.6,
+            Flexible(
+              Text(
+                profile
+                overflow: TextOverflow.ellipsis,
+                    ? 'Plugger'
+                    : _tab == 0
+                    ? 'plugger'
+                    : titles[_tab],
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.6,
+                ),
               ),
             ),
           ],
