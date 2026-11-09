@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 const pluggerViolet = Color(0xFF6956E8);
 const pluggerInk = Color(0xFF202033);
-const pluggerCanvas = Color(0xFFF7F7FB);
+const pluggerCanvas = Colors.white;
 
 ThemeData pluggerLightTheme() => ThemeData(
   useMaterial3: true,

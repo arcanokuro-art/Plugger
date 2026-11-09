@@ -11,6 +11,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('plugger'), findsOneWidget);
+    final theme = Theme.of(tester.element(find.byType(NavigationBar)));
+    expect(theme.brightness, Brightness.light);
+    expect(theme.scaffoldBackgroundColor, Colors.white);
     expect(
       tester.widget<NavigationBar>(find.byType(NavigationBar)).labelBehavior,
       NavigationDestinationLabelBehavior.alwaysHide,

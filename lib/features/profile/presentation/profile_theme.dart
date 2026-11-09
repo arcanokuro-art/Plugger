@@ -2,11 +2,12 @@ part of '../profile_page.dart';
 
 const _classicDark = Color(0xFF0D0F18);
 const _violet = Color(0xFF9860FF);
+const _defaultThemeIndex = 2;
 
 const _themes = <(String, Color, Color)>[
   ('Oscuro violeta', _classicDark, _violet),
   ('Oscuro', Color(0xFF151620), Color(0xFFAAA9CC)),
-  ('Claro', pluggerCanvas, pluggerViolet),
+  ('Blanco', pluggerCanvas, pluggerViolet),
   ('Violeta', Color(0xFF1B1036), Color(0xFFAB65FF)),
   ('Azul', Color(0xFF081D35), Color(0xFF4FAAFF)),
   ('Rojo', Color(0xFF300F19), Color(0xFFFF637D)),
@@ -16,7 +17,7 @@ const _themes = <(String, Color, Color)>[
 ];
 
 ThemeData profileTheme(ProfileData data) {
-  if (data.theme == 2) return pluggerLightTheme();
+  if (data.theme == _defaultThemeIndex) return pluggerLightTheme();
   final (_, background, color) = _themes[data.theme];
   final accent = data.useAccent ? color : _violet;
   const brightness = Brightness.dark;

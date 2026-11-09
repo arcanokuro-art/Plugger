@@ -14,7 +14,9 @@ class ProfileData {
     'Desarrollador • Artista • Creador de Velyntora\nDibujo, animación, tecnología y más. 🎨',
   );
   int get theme =>
-      (values['theme'] as int? ?? 2).clamp(0, _themes.length - 1).toInt();
+      (values['theme'] as int? ?? _defaultThemeIndex)
+          .clamp(0, _themes.length - 1)
+          .toInt();
   bool get useAccent => values['accent'] as bool? ?? true;
   bool get coverEffect => values['effect'] as bool? ?? false;
   bool get rounded => values['rounded'] as bool? ?? true;
