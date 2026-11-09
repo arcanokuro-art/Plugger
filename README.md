@@ -6,10 +6,31 @@ Prototipo inicial de una red social con feed unificado, desarrollado en Flutter.
 - Feed con tarjetas de publicaciones de demostración y filtros por origen.
 - Creación de publicaciones locales (solo en memoria).
 - Botón de Me gusta local.
-- Pestañas Inicio, Explorar, Avisos y Perfil.
+- Pestañas Inicio, Explorar, Avisos, Mensajes y Perfil.
+- Perfil, mensajes y contactos con almacenamiento local.
 - Pantallas preparadas para futuras integraciones.
 
-> **Estado:** prototipo visual. No existe autenticación, base de datos, persistencia ni conexión real con plataformas externas. Las publicaciones de YouTube y X son ejemplos ficticios.
+> **Estado:** prototipo visual. La autenticación, el servidor y la conexión con plataformas externas están pendientes. Las publicaciones de YouTube y X son ejemplos ficticios.
+
+## Arquitectura modular de Zaskar
+
+| Ruta | Responsabilidad |
+| --- | --- |
+| `lib/main.dart` | Punto de entrada de Flutter. |
+| `lib/app/` | Ensamblaje de la aplicación y navegación principal. |
+| `lib/features/feed/` | Publicaciones, filtros y editor de publicaciones. |
+| `lib/features/explore/` y `lib/features/notifications/` | Explorar y Avisos. |
+| `lib/features/messages/` | Chats, contactos, conversación y almacenamiento local. |
+| `lib/features/profile/` | Perfil, edición, apariencia y almacenamiento local. |
+| `lib/shared/` | Paleta y componentes reutilizados entre módulos. |
+| `assets/` | Recursos agrupados por función. |
+| `test/app/` | Pruebas de navegación y flujos entre módulos. |
+| `.github/` | Compilación, verificación de firma y publicación Android. |
+
+Cada función mantiene sus pantallas, modelos y almacenamiento en su módulo
+cuando los necesita. La capa `app` conecta los módulos mediante sus pantallas
+públicas y callbacks. Los archivos `part` agrupan piezas internas de una misma
+función sin exponer sus tipos privados a otras funciones.
 
 ## Ejecutar
 
