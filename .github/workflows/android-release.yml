@@ -32,7 +32,12 @@ jobs:
           channel: stable
           cache: true
       - name: Generate Android platform files
-        run: flutter create --platforms=android --project-name plugger --org com.example .
+        run: |
+          flutter create --platforms=android --project-name plugger --org com.example .
+          # Flutter can scaffold a sample test when the project's tests live under test/app.
+          if ! git ls-files --error-unmatch test/widget_test.dart >/dev/null 2>&1; then
+            rm -f test/widget_test.dart
+          fi
       - name: Install dependencies
         run: flutter pub get
       - name: Analyze source
