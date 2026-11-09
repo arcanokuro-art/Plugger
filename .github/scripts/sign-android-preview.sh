@@ -32,9 +32,16 @@ printf '%s' "$PLUGGER_ANDROID_KEYSTORE_BASE64" | base64 --decode > "$keystore"
   --key-pass env:PLUGGER_ANDROID_KEYSTORE_PASSWORD \
   --out "$output_apk" "$input_apk"
 
-actual_cert=$("$apksigner" verify --print-certs "$output_apk" |
-  awk '/^Signer #[0-9]+ certificate SHA-256 digest:/ {print tolower($NF)}')
+verification=$("$apksigner" verify --print-certs "$output_apk")
+actual_cert=$(printf '%s\n' "$verification" | awk '
+  /^[[:space:]]*Signer.*certificate SHA-256 digest:/ {
+    sub(/^.*certificate SHA-256 digest:[[:space:]]*/, "")
+    gsub(/[:[:space:]]/, "")
+    print tolower($0)
+  }
+' | sort -u)
 if [[ $actual_cert != "$expected_cert" ]]; then
+  printf '%s\n' "$verification" >&2
   rm -f "$output_apk"
   echo 'La firma del APK no coincide con el certificado fijo de Plugger.' >&2
   exit 1
