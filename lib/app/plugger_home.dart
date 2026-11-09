@@ -60,30 +60,28 @@ class _PluggerHomeState extends State<PluggerHome> {
     final profile = _tab == 4;
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(
-              Icons.hub_rounded,
-              color: Theme.of(context).colorScheme.primary,
-              size: 28,
-            ),
-            const SizedBox(width: 9),
-            Flexible(
-              child: Text(
-                profile
-                    ? 'Plugger'
-                    : _tab == 0
-                    ? 'plugger'
-                    : titles[_tab],
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.6,
+        title: profile
+            ? null
+            : Row(
+              children: [
+                Icon(
+                  Icons.hub_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 28,
                 ),
-              ),
+                const SizedBox(width: 9),
+                Flexible(
+                  child: Text(
+                    _tab == 0 ? 'plugger' : titles[_tab],
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.6,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
         actions: [
           if (_tab != 3)
             IconButton(
